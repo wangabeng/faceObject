@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+
+<style>
+	*{
+		padding:0;
+		margin:0;
+	}
+	div{
+		width:100px;
+		height:100px;
+		position:absolute;
+		background-color:green;
+		left:0;
+		top:0;
+	}
+</style>
+
+</head>
+<script></script>
+
+<body>
+
+<div id='test'></div>
+
+</body>
+
+</html>
+<script>
+window.onload=function(){
+	var oDiv=new Drag('test');
+	oDiv.init();
+}
+
+function Drag(idname){
+	this.obj=document.getElementById(idname);
+	this.disX=0;
+	this.disY=0;
+}
+
+Drag.prototype.init=function(){
+	var outerThat=this;
+	this.obj.onmousedown=function(){
+		outerThat.fndown();
+	}
+}
+
+Drag.prototype.fndown=function(ev){
+	//console.log(this);
+	var ev=ev||window.event;
+	this.disX=ev.clientX-this.obj.offsetLeft;
+	this.disY=ev.clientY-this.obj.offsetTop;
+	var that=this;
+
+	//move
+	document.onmousemove=function(){
+		that.fnmove();//Drag对象调用fnmove这个方法 见67行this 
+	}
+	//up
+	document.onmouseup=function(){
+		that.fnup();
+	}
+
+	return false;
+}
+
+Drag.prototype.fnmove=function(ev){
+	var ev=ev||window.event;
+	this.obj.style.left=ev.clientX-this.disX+'px';
+	this.obj.style.top=ev.clientY-this.disY+'px';
+	//console.log(this); 谁调用 this就是指谁Drag对象
+}
+
+Drag.prototype.fnup=function(){
+	document.onmousemove=null;
+}
+</script>
+
+
+
+<!-- 	//面向过程拖拽
+oDiv.onmousedown=function (ev){
+	ev=ev||window.event;
+	//获取初始状态的鼠标相对位置
+	disX=ev.clientX-oDiv.offsetLeft;
+	disY=ev.clientY-oDiv.offsetTop;
+
+	document.onmousemove=function(ev){
+		var ev=ev||window.event;
+		if (ev.clientX-disX<0){
+			oDiv.style.left=0;
+		}else if( (ev.clientX-disX+oDiv.offsetWidth)>(document.body.clientWidth||document.documentElement.clientWidth) ){
+			oDiv.style.left=(document.body.clientWidth||document.documentElement.clientWidth)-oDiv.offsetWidth+'px';
+		}else{
+			oDiv.style.left=ev.clientX-disX+'px';
+		}
+
+		if (ev.clientY-disY<0){
+			oDiv.style.top=0;
+		}else if( (ev.clientY-disY+oDiv.offsetHeight)>(document.body.clientHeight||document.documentElement.clientHeight) ){
+			oDiv.style.top=(document.body.clientHeight||document.documentElement.clientHeight)-oDiv.offsetHeight+'px';
+		}else{
+			oDiv.style.top=ev.clientY-disY+'px';
+		}
+	}
+	document.onmouseup=function(){
+		document.onmousemove=null;
+	}
+	return false;
+} -->
