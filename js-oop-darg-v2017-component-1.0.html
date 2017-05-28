@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+
+<style>
+	*{
+		padding:0;
+		margin:0;
+	}
+	#test{
+		width:100px;
+		height:100px;
+		position:absolute;
+		background-color:green;
+		left:0;
+		top:0;
+	}
+	#test2{
+		width:100px;
+		height:100px;
+		position:absolute;
+		background-color:red;
+		left:150px;
+		top:0;
+	}
+	#test3{
+		width:100px;
+		height:100px;
+		position:absolute;
+		background-color:pink;
+		left:300px;
+		top:0;
+	}
+</style>
+
+</head>
+<script></script>
+
+<body>
+
+<div id='test'></div>
+<div id='test2'></div>
+<div id='test3'></div>
+
+</body>
+
+</html>
+<script>
+window.onload=function(){
+	var oDiv=new Drag();
+	oDiv.init({
+		idname:'test'
+	});
+
+	var oDiv2=new Drag();
+	oDiv2.init({
+		idname:'test2',
+		callback1:function(){
+			document.body.style.backgroundColor='blue';
+		}
+	});
+
+	var oDiv3=new Drag();
+	oDiv3.init({
+		idname:'test3',
+		callback1:function(){
+			document.title='blue';
+		},
+		callback2:function(){
+			document.title='orig';
+		}
+	});
+
+}
+
+function Drag(){
+	this.disX=0;
+	this.disY=0;
+	this.settings={//默认设置参数
+		idname:'',
+		callback1:function(){
+		},
+		callback2:function(){
+		}
+	}
+}
+
+
+
+Drag.prototype.init=function(paraObj){//为什么str不能传递到fnup里 见最下面的代码
+	//
+	extending(this.settings,paraObj);
+
+	var outerThat=this;//this指代新建的对象Drag
+	this.obj=document.getElementById(this.settings.idname);
+	this.obj.onmousedown=function(){
+		outerThat.settings.callback1();
+		//test 
+		//outerThat.callback2=callback2;
+		outerThat.fndown();//这里如果用this就不成功 这里的this指Drag.obj
+	}
+}
+
+Drag.prototype.fndown=function(ev){
+	//console.log(this.callback2);
+	var ev=ev||window.event;
+	this.disX=ev.clientX-this.obj.offsetLeft;//this指代新建的对象Drag
+	this.disY=ev.clientY-this.obj.offsetTop;
+	var that=this;
+
+	//move
+	document.onmousemove=function(){
+		that.fnmove();//Drag对象调用fnmove这个方法 
+	}
+	//up
+	document.onmouseup=function(){
+		that.fnup();
+		that.settings.callback2();
+		//console.log(that);
+	}
+
+	return false;
+}
+
+Drag.prototype.fnmove=function(ev){
+	var ev=ev||window.event;
+	this.obj.style.left=ev.clientX-this.disX+'px';
+	this.obj.style.top=ev.clientY-this.disY+'px';
+	//console.log(this); 谁调用 this就是指谁Drag对象
+}
+
+Drag.prototype.fnup=function(){
+	document.onmousemove=null;
+}
+
+//方法继承公共函数
+function extending(obj1,obj2){
+	for (var attr in obj2) {
+		obj1[attr]=obj2[attr];
+	}
+}
+
+</script>
+
+
+
+<!-- 	//面向过程拖拽
+oDiv.onmousedown=function (ev){
+	ev=ev||window.event;
+	//获取初始状态的鼠标相对位置
+	disX=ev.clientX-oDiv.offsetLeft;
+	disY=ev.clientY-oDiv.offsetTop;
+
+	document.onmousemove=function(ev){
+		var ev=ev||window.event;
+		if (ev.clientX-disX<0){
+			oDiv.style.left=0;
+		}else if( (ev.clientX-disX+oDiv.offsetWidth)>(document.body.clientWidth||document.documentElement.clientWidth) ){
+			oDiv.style.left=(document.body.clientWidth||document.documentElement.clientWidth)-oDiv.offsetWidth+'px';
+		}else{
+			oDiv.style.left=ev.clientX-disX+'px';
+		}
+
+		if (ev.clientY-disY<0){
+			oDiv.style.top=0;
+		}else if( (ev.clientY-disY+oDiv.offsetHeight)>(document.body.clientHeight||document.documentElement.clientHeight) ){
+			oDiv.style.top=(document.body.clientHeight||document.documentElement.clientHeight)-oDiv.offsetHeight+'px';
+		}else{
+			oDiv.style.top=ev.clientY-disY+'px';
+		}
+	}
+	document.onmouseup=function(){
+		document.onmousemove=null;
+	}
+	return false;
+} -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ////////////////////////////////////////////////////////////////////////// -->
+
+
+<!-- 作用域及闭包的问题 a的参数作用域问题  -->
+
+<!-- <!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+
+<style>
+
+</style>
+
+</head>
+<script></script>
+
+<body>
+
+<button id='test'>btn</button>
+
+</body>
+
+</html>
+<script>
+window.onload=function(){
+	var btn=document.getElementById('test');
+	doouter(2,9);
+
+	function doouter(a,b){
+		console.log('doouter-a:'+a);
+		btn.onclick=function(){
+			console.log(a);
+			//doinner();
+			function doinner(){
+				alert(a);
+			};
+			doinner();
+		}
+	}
+
+	function doinner(){
+		alert(a);
+	}
+
+}
+</script> -->
